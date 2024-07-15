@@ -5,3 +5,6 @@ __pycache__/
 ./__pycache__/*
 experiments
 .ipynb_checkpoints/
+pretrained_models/
+pretrained_models.zip
+.DS_Store

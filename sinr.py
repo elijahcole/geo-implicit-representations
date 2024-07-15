@@ -20,7 +20,7 @@ def get_cur_path():
     return str(Path(__file__).parent)
 
 
-def load_taxa_metadata(file_path='/taxa_02_08_2023_names.txt'):
+def load_taxa_metadata(file_path='web_app/taxa_02_08_2023_names.txt'):
     cur_path = get_cur_path()
     taxa_names_file = open(cur_path + file_path, "r")
     data = taxa_names_file.read().split("\n")
