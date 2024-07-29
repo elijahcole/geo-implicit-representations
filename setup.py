@@ -17,10 +17,19 @@ def get_default_params_train(overrides={}):
     '''
     misc
     '''
-    params['device'] = 'cuda' # cuda, cpu
+    params['device'] = torch.device('cuda' if torch.cuda.is_available() else 'cpu') # cuda, cpu
     params['save_base'] = './experiments/'
     params['experiment_name'] = 'demo'
     params['timestamp'] = False
+
+    '''
+    annotation | fine-tuning
+    '''
+    params['fine_tuned_save_base'] = './fine-tuned/'
+    params['fine_tuned_experiment_name'] = 'demo'
+    params['pretrain_model_path'] = ''
+    params['annotation_file'] = ''
+    params['model_name'] = ''
 
     '''
     data

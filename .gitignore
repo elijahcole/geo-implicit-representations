@@ -8,3 +8,7 @@ pretrained_models/
 pretrained_models.zip
 .DS_Store
 .env
+data.zip
+fine-tuned/*
+annotation/
+data/
