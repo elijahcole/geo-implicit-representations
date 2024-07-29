@@ -117,7 +117,7 @@ def launch_fine_tuning_run(ovr):
     # data:
     train_dataset = get_annotation_data(params)
     params['input_dim'] = train_dataset.input_dim
-    params['num_classes'] = train_dataset.num_classes
+    params['num_classes'] = 47375 # this gives error because during fine tuning it becomes smaller number, 2, fix
     params['class_to_taxa'] = train_dataset.class_to_taxa
     train_loader = torch.utils.data.DataLoader(
         train_dataset,

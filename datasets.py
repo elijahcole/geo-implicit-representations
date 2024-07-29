@@ -5,7 +5,7 @@ import pandas as pd
 from calendar import monthrange
 import torch
 
-import utils
+from . import utils
 
 class LocationDataset(torch.utils.data.Dataset):
     def __init__(self, locs, labels, classes, class_to_taxa, input_enc, device):

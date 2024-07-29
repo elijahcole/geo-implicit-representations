@@ -59,6 +59,8 @@ def get_model_path(selected_model):
         model_path = f'{cur_path}/pretrained_models/model_an_full_input_enc_sin_cos_hard_cap_num_per_class_1000.pt'
     elif selected_model == 'Distilled_env_model':
         model_path = f'{cur_path}/pretrained_models/model_an_full_input_enc_sin_cos_distilled_from_env.pt'
+    elif selected_model == 'fine-tuned':
+        model_path = f'{cur_path}/pretrained_models/test_fine_tune.pt'
     return model_path
 
 
