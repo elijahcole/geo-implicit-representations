@@ -12,6 +12,7 @@ import setup
 import models
 
 def load_annotation_data(annotation_file, taxa_of_interest):
+    print('\nLoading ' + annotation_file)
     data = pd.read_csv(annotation_file, index_col=0)
 
     # remove outliers
@@ -45,13 +46,16 @@ def get_annotation_data(params):
     
     data_dir = paths['train']
     annotation_dir = paths['annotation']
+    train_dir = paths['train']
     annotation_file = os.path.join(annotation_dir, params['annotation_file'])
+    train_file = os.path.join(train_dir, params['obs_file'])
     taxa_file = os.path.join(data_dir, params['taxa_file'])
     taxa_file_snt = os.path.join(data_dir, 'taxa_subsets.json')
 
     taxa_of_interest = datasets.get_taxa_of_interest(params['species_set'], params['num_aux_species'], params['aux_species_seed'], params['taxa_file'], taxa_file_snt)
 
-    locs, labels = load_annotation_data(annotation_file, taxa_of_interest)
+    _, labels, _, _, _, _ = datasets.load_inat_data(train_file, taxa_of_interest) # load labels from original training data to combat dimensional conflict
+    locs, _ = load_annotation_data(annotation_file, taxa_of_interest) # has only 2 labels
     unique_taxa, class_ids = np.unique(labels, return_inverse=True)
     class_to_taxa = unique_taxa.tolist()
 
@@ -60,11 +64,9 @@ def get_annotation_data(params):
     taxa_ids_file = [cc['taxon_id'] for cc in class_info_file]
     classes = dict(zip(taxa_ids_file, class_names_file))
 
-    idx_ss = datasets.get_idx_subsample_observations(labels, params['hard_cap_num_per_class'], params['hard_cap_seed'])
-
-    locs = torch.from_numpy(np.array(locs)[idx_ss]) # convert to Tensor
-
-    labels = torch.from_numpy(np.array(class_ids)[idx_ss])
+    # idx_ss = datasets.get_idx_subsample_observations(labels, params['hard_cap_num_per_class'], params['hard_cap_seed'])
+    locs = torch.from_numpy(np.array(locs)) # convert to Tensor
+    labels = torch.from_numpy(np.array(class_ids))
 
     ds = datasets.LocationDataset(locs, labels, classes, class_to_taxa, params['input_enc'], params['device'])
 
@@ -86,6 +88,10 @@ class FineTuner():
         save_path = os.path.join(self.params['save_path'], str(self.params['model_name'] + '.pt'))
         op_state = {'state_dict': self.model.state_dict(), 'params': self.params}
         torch.save(op_state, save_path)
+
+        # save_path_json = os.path.join(self.params['save_path'], str(self.params['model_name'] + '.json'))
+        # with open(save_path_json, "w") as f:
+        #     json.dump(dict(self.params), f)
 
     def train_one_epoch(self):
         self.model.train()
@@ -114,22 +120,24 @@ def launch_fine_tuning_run(ovr):
     params['save_path'] = os.path.join(params['fine_tuned_save_base'], params['fine_tuned_experiment_name'])
     os.makedirs(params['save_path'], exist_ok=True)
 
+    # model:
+    pretrain_params = torch.load(ovr['pretrain_model_path'], map_location='cpu')
+    model = models.get_model(pretrain_params['params'])
+    model.load_state_dict(pretrain_params['state_dict'], strict=True)
+    model = model.to(params['device'])
+
     # data:
     train_dataset = get_annotation_data(params)
+    # params['input_dim'] = pretrain_params['input_dim']
     params['input_dim'] = train_dataset.input_dim
-    params['num_classes'] = 47375 # this gives error because during fine tuning it becomes smaller number, 2, fix
+    # params['num_classes'] = pretrain_params['num_classes']
+    params['num_classes'] = train_dataset.num_classes
     params['class_to_taxa'] = train_dataset.class_to_taxa
     train_loader = torch.utils.data.DataLoader(
         train_dataset,
         batch_size=params['batch_size'],
         shuffle=True,
         num_workers=4)
-
-    # model:
-    pretrain_params = torch.load(ovr['pretrain_model_path'], map_location='cpu')
-    model = models.get_model(pretrain_params['params'])
-    model.load_state_dict(pretrain_params['state_dict'], strict=True)
-    model = model.to(params['device'])
 
     # train:
     trainer = FineTuner(model, train_loader, params)

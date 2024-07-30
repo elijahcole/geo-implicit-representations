@@ -62,7 +62,7 @@ pre_trained_models = {
     }
 }
 
-train_params['pretrain_model_path'] = os.path.join(pretrain_path, pre_trained_models['npc1000']['path'])
+train_params['pretrain_model_path'] = os.path.join(pretrain_path, pre_trained_models['npc10']['path'])
 train_params['annotation_file'] = 'example.csv'
 train_params['model_name'] = 'test_fine_tune'
 
