@@ -19,7 +19,7 @@ hard_cap_num_per_class
 - Maximum number of examples per class to use for training.
 - Valid values: positive integers or -1 (indicating no cap).
 '''
-train_params['hard_cap_num_per_class'] = 1000
+train_params['hard_cap_num_per_class'] = -1
 
 '''
 num_aux_species
@@ -63,8 +63,11 @@ pre_trained_models = {
 }
 
 train_params['pretrain_model_path'] = os.path.join(pretrain_path, pre_trained_models['npc10']['path'])
-train_params['annotation_file'] = 'example.csv'
-train_params['model_name'] = 'test_fine_tune'
+train_params['annotation_file'] = 'example2.csv'
+train_params['model_name'] = 'fine_tune_xsmall_lr'
+
+train_params['lr'] = 0.0001
+train_params['lr_decay'] = 0.8
 
 if __name__ == '__main__':
     fine_tuner.launch_fine_tuning_run(train_params)

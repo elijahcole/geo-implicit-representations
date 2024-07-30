@@ -90,7 +90,7 @@ def main(eval_params):
         vmax = np.max(op_im)
     
     # save image
-    save_loc = os.path.join(eval_params['op_path'], str(eval_params['taxa_id']) + '_map.png')
+    save_loc = os.path.join(eval_params['op_path'], eval_params['name'] + '_' + str(eval_params['taxa_id']) + '_map.png')
     print(f'Saving image to {save_loc}')
     plt.imsave(fname=save_loc, arr=op_im, vmin=0, vmax=vmax, cmap=cmap)
     
@@ -108,6 +108,7 @@ if __name__ == '__main__':
                'Warning: these estimated ranges should be validated before use.'  
                
     parser = argparse.ArgumentParser(usage=info_str)
+    parser.add_argument('--name', type=str, default='demo')
     parser.add_argument('--model_path', type=str, default='./pretrained_models/model_an_full_input_enc_sin_cos_hard_cap_num_per_class_1000.pt')
     parser.add_argument('--taxa_id', type=int, default=130714, help='iNaturalist taxon ID.')
     parser.add_argument('--threshold', type=float, default=-1, help='Threshold the range map [0, 1].')

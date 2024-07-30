@@ -126,6 +126,8 @@ def launch_fine_tuning_run(ovr):
     model.load_state_dict(pretrain_params['state_dict'], strict=True)
     model = model.to(params['device'])
 
+    print('Params: ', params)
+
     # data:
     train_dataset = get_annotation_data(params)
     # params['input_dim'] = pretrain_params['input_dim']

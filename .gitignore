@@ -13,3 +13,4 @@ fine-tuned/*
 annotation/
 data/
 images/
+scripts/out/
