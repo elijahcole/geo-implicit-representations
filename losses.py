@@ -1,4 +1,5 @@
 import torch
+from torch.nn import functional as F
 import utils
 
 def get_loss_function(params):
@@ -14,6 +15,10 @@ def get_loss_function(params):
         return an_slds_me
     elif params['loss'] == 'an_ssdl_me':
         return an_ssdl_me
+    elif params['loss'] == 'bce':
+        return bce
+    elif params['loss'] == 'an_full_bce':
+        return an_full_bce
 
 def neg_log(x):
     return -torch.log(x + 1e-5)
@@ -21,6 +26,23 @@ def neg_log(x):
 def bernoulli_entropy(p):
     entropy = p * neg_log(p) + (1-p) * neg_log(1-p)
     return entropy
+
+def bce(batch, model, params, loc_to_feats):
+    inds = torch.arange(params['batch_size'])
+
+    loc_feat, _, class_id, types = batch
+    loc_feat = loc_feat.to(params['device'])
+    class_id = class_id.to(params['device'])
+    types = types.to(params['device'])
+
+    assert model.inc_bias == False
+    batch_size = loc_feat.shape[0]
+
+    loc_emb = model(loc_feat, return_feats=True)
+    loc_pred = torch.sigmoid(model.class_emb(loc_emb))
+    bce_loss = F.binary_cross_entropy(loc_pred[inds[:batch_size], class_id], types.float())
+    # print(loc_pred[inds[:batch_size], class_id], type.float(), bce_loss)
+    return bce_loss
 
 def an_ssdl(batch, model, params, loc_to_feats, neg_type='hard'):
 
@@ -144,3 +166,14 @@ def an_ssdl_me(batch, model, params, loc_to_feats):
 def an_slds_me(batch, model, params, loc_to_feats):
     
     return an_slds(batch, model, params, loc_to_feats, neg_type='entropy')
+
+def an_full_bce(batch, model, params, loc_to_feats):
+    bce_loss = bce(batch, model, params, loc_to_feats)
+
+    loc_feat, _, class_id, types = batch
+
+    mask = types == 1 # only take presence data into an_full
+    loc_feat = loc_feat[mask]
+    class_id = class_id[mask]
+
+    return an_full((loc_feat, _, class_id), model, params, loc_to_feats)

@@ -7,7 +7,6 @@
 #SBATCH -p gpu-preempt
 #SBATCH --time 01:00:00
 #SBATCH -o scripts/out/fine_tune_%j.out
-#SBATCH --mail-type END
 
 module load miniconda/22.11.1-1
 conda activate sinr_icml

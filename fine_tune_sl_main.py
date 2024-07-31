@@ -1,7 +1,7 @@
 import os
 import json
 
-import fine_tune
+import fine_tune_sl
 
 train_params = {}
 
@@ -38,9 +38,9 @@ train_params['input_enc'] = 'sin_cos'
 '''
 loss
 - Which loss to use for training.
-- Valid values: 'an_full', 'an_slds', 'an_ssdl', 'an_full_me', 'an_slds_me', 'an_ssdl_me', 'bce' (for fine tuning), 'an_full_bce'
+- Valid values: 'an_full', 'an_slds', 'an_ssdl', 'an_full_me', 'an_slds_me', 'an_ssdl_me'
 '''
-train_params['loss'] = 'an_full_bce'
+train_params['loss'] = 'an_full'
 
 with open("paths.json", 'r') as f:
     paths = json.load(f)
@@ -62,17 +62,12 @@ pre_trained_models = {
     }
 }
 
-train_params['log_frequency'] = 5
-train_params['batch_size'] = 512
+train_params['pretrain_model_path'] = os.path.join(pretrain_path, pre_trained_models['npc10']['path'])
+train_params['annotation_file'] = 'example2.csv'
+train_params['model_name'] = 'fine_tune_xsmall_lr'
 
-train_params['pretrain_model_path'] = os.path.join(pretrain_path, pre_trained_models['npc10']['path']) # you can choose a base model, refer to dictionary above
-train_params['annotation_file'] = 'presence_absence2.csv' # enter the csv file you want to train on
-train_params['model_name'] = 'ft_pa2' # name your output model, it will be saved in ./fine-tuned/${experiment_name}/${model_name}.pt
-
-train_params['lr'] = 5e-5
-train_params['lr_decay'] = 0.2
-
-train_params['pos_weight'] = 128
+train_params['lr'] = 0.0001
+train_params['lr_decay'] = 0.8
 
 if __name__ == '__main__':
-    fine_tune.launch_fine_tuning_run(train_params)
+    fine_tune_sl.launch_fine_tuning_run(train_params)
