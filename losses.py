@@ -17,8 +17,8 @@ def get_loss_function(params):
         return an_ssdl_me
     elif params['loss'] == 'bce':
         return bce
-    elif params['loss'] == 'an_full_bce':
-        return an_full_bce
+    elif params['loss'] == 'bce_ssdl_an':
+        return bce_ssdl_an
 
 def neg_log(x):
     return -torch.log(x + 1e-5)
@@ -28,6 +28,19 @@ def bernoulli_entropy(p):
     return entropy
 
 def bce(batch, model, params, loc_to_feats):
+    """
+    Calculates binary cross entropy loss of prediction at a location targeted to the corresponding annotation.
+
+    Parameters:
+        - batch: the annotation batch that supplies: locational features, locations (unused), class ids, annotation types (0 | 1)
+        - model: the model used to calculate loss for
+        - params: training | annotation parameters used for fine tuning
+        - loc_to_feats (unused): location encoder
+    
+    Returns:
+        - bce_loss: A torch Loss object that you would use to calculate backwards on.
+    """
+
     inds = torch.arange(params['batch_size'])
 
     loc_feat, _, class_id, types = batch
@@ -40,8 +53,9 @@ def bce(batch, model, params, loc_to_feats):
 
     loc_emb = model(loc_feat, return_feats=True)
     loc_pred = torch.sigmoid(model.class_emb(loc_emb))
-    bce_loss = F.binary_cross_entropy(loc_pred[inds[:batch_size], class_id], types.float())
-    # print(loc_pred[inds[:batch_size], class_id], type.float(), bce_loss)
+    weights = torch.where(types == 0, torch.tensor(100.0).to(params['device']), torch.tensor(1.0).to(params['device']))
+    weights = weights.to(params['device'])
+    bce_loss = F.binary_cross_entropy(loc_pred[inds[:batch_size], class_id], types.float(), weights)
     return bce_loss
 
 def an_ssdl(batch, model, params, loc_to_feats, neg_type='hard'):
@@ -167,13 +181,36 @@ def an_slds_me(batch, model, params, loc_to_feats):
     
     return an_slds(batch, model, params, loc_to_feats, neg_type='entropy')
 
-def an_full_bce(batch, model, params, loc_to_feats):
+def bce_ssdl_an(batch, model, params, loc_to_feats, neg_type='hard'):
+    """
+
+    Parameters:
+        - batch: the annotation batch that supplies: locational features, locations (unused), class ids, annotation types (0 | 1)
+        - model: the model used to calculate loss for
+        - params: training | annotation parameters used for fine tuning
+        - loc_to_feats (unused): location encoder
+    
+    Returns:
+
+    """
     bce_loss = bce(batch, model, params, loc_to_feats)
 
-    loc_feat, _, class_id, types = batch
+    inds = torch.arange(params['batch_size'])
 
-    mask = types == 1 # only take presence data into an_full
-    loc_feat = loc_feat[mask]
-    class_id = class_id[mask]
+    loc_feat, _, class_id, _ = batch
+    loc_feat = loc_feat.to(params['device'])
+    class_id = class_id.to(params['device'])
+    
+    assert model.inc_bias == False
+    batch_size = loc_feat.shape[0]
+    
+    # create random background samples and extract features
+    rand_loc = utils.rand_samples(batch_size, params['device'], rand_type='spherical')
+    rand_feat = loc_to_feats(rand_loc, normalize=False)
 
-    return an_full((loc_feat, _, class_id), model, params, loc_to_feats)
+    loc_emb = model(rand_feat, return_feats=True)
+    loc_pred = torch.sigmoid(model.class_emb(loc_emb))
+    loc_pred_input = loc_pred[inds[:batch_size], class_id]
+    dl_an = F.binary_cross_entropy(loc_pred_input, torch.zeros_like(loc_pred_input))
+
+    return bce_loss * params['bce_weight'] + dl_an * (params['bce_weight'] * 1000)

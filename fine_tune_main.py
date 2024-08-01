@@ -1,3 +1,8 @@
+"""
+This file provides parameters for you to configure when you want to fine tune a geomodel, running this file will start the fine tuning process.
+Each parameter is explained briefly.
+"""
+
 import os
 import json
 
@@ -38,9 +43,9 @@ train_params['input_enc'] = 'sin_cos'
 '''
 loss
 - Which loss to use for training.
-- Valid values: 'an_full', 'an_slds', 'an_ssdl', 'an_full_me', 'an_slds_me', 'an_ssdl_me', 'bce' (for fine tuning), 'an_full_bce'
+- Valid values: 'an_full', 'an_slds', 'an_ssdl', 'an_full_me', 'an_slds_me', 'an_ssdl_me', 'bce' (for fine tuning), 'bce_ssdl_an' (for_fine_tuning)
 '''
-train_params['loss'] = 'an_full_bce'
+train_params['loss'] = 'bce_ssdl_an'
 
 with open("paths.json", 'r') as f:
     paths = json.load(f)
@@ -62,17 +67,18 @@ pre_trained_models = {
     }
 }
 
-train_params['log_frequency'] = 5
-train_params['batch_size'] = 512
+train_params['log_frequency'] = 10 # how frequently the program will log training progress
+train_params['batch_size'] = 128 # batch size affects the speed of execution, and how the model will learn
 
-train_params['pretrain_model_path'] = os.path.join(pretrain_path, pre_trained_models['npc10']['path']) # you can choose a base model, refer to dictionary above
-train_params['annotation_file'] = 'presence_absence2.csv' # enter the csv file you want to train on
-train_params['model_name'] = 'ft_pa2' # name your output model, it will be saved in ./fine-tuned/${experiment_name}/${model_name}.pt
+train_params['pretrain_model_path'] = os.path.join(pretrain_path, pre_trained_models['npc1000']['path']) # you can choose a base model, refer to dictionary above
+train_params['annotation_file'] = 'pa3.csv' # enter the csv file you want to train on
+train_params['model_name'] = 'pa3' # name your output model, it will be saved in ./fine-tuned/${experiment_name}/${model_name}.pt
 
-train_params['lr'] = 5e-5
-train_params['lr_decay'] = 0.2
+train_params['lr'] = 1e-4 # learning rate
+train_params['lr_decay'] = 0.8 # decay rate at each epoch
 
-train_params['pos_weight'] = 128
+train_params['bce_weight'] = 1
+train_params['num_epochs'] = 10
 
 if __name__ == '__main__':
     fine_tune.launch_fine_tuning_run(train_params)

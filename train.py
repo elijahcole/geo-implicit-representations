@@ -55,6 +55,7 @@ class Trainer():
 
     def save_model(self):
         save_path = os.path.join(self.params['save_path'], 'model.pt')
+        print('Saved to: ', save_path)
         op_state = {'state_dict': self.model.state_dict(), 'params' : self.params}
         torch.save(op_state, save_path)
 

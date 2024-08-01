@@ -10,7 +10,7 @@ import torch.utils.data
 import utils
 
 class BinaryLocationDataset(torch.utils.data.Dataset):
-    def __init__(self, locs, labels, classes, types, class_to_taxa, input_enc, device):
+    def __init__(self, locs, labels, classes, hex_types, class_to_taxa, input_enc, device):
         # handle input encoding:
         self.input_enc = input_enc
         if self.input_enc in ['env', 'sin_cos_env']:
@@ -24,7 +24,7 @@ class BinaryLocationDataset(torch.utils.data.Dataset):
         self.loc_feats = self.enc.encode(self.locs)
         self.labels = labels
         self.classes = classes
-        self.types = types # holds 0 | 1
+        self.hex_types = hex_types # holds 0 | 1
         self.class_to_taxa = class_to_taxa
 
         # useful numbers:
@@ -41,8 +41,8 @@ class BinaryLocationDataset(torch.utils.data.Dataset):
         loc_feat  = self.loc_feats[index, :]
         loc       = self.locs[index, :]
         class_id  = self.labels[index]
-        type = self.types[index]
-        return loc_feat, loc, class_id, type
+        hex_type = self.hex_types[index]
+        return loc_feat, loc, class_id, hex_type
 
 class LocationDataset(torch.utils.data.Dataset):
     def __init__(self, locs, labels, classes, class_to_taxa, input_enc, device):

@@ -25,11 +25,12 @@ def get_default_params_train(overrides={}):
     '''
     annotation | fine-tuning
     '''
-    params['fine_tuned_save_base'] = './fine-tuned/'
+    params['fine_tuned_save_base'] = './fine-tuned/' # additional
     params['fine_tuned_experiment_name'] = 'demo'
     params['pretrain_model_path'] = ''
     params['annotation_file'] = ''
     params['model_name'] = ''
+    params['bce_weight'] = 1
 
     '''
     data
