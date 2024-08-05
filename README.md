@@ -192,7 +192,7 @@ Now run `python reproduce.py` to create recon results from pretrained models. Wh
 Contact Ozel with errors if any.
 
 ### Fine Tuning
-Make sure you have followed the steps for downloading training data described above.
+Make sure you have followed the steps for downloading training data and pretrained models described above.
 
 To extract annotation data from iNatAtor, use `data_extraction.ipynb` or `data_extraction.py` (to submit as jobs). You will need to confidure a .env that has connection secrets. If your database is running in your local computer and you want to use unity to extract data as a job you will need to build a tunnel. For development and testing I suggest running this script on the same computer as your database and then upload the .csv file into unity to `inaturalist-sinr/data/annotation`.
 
