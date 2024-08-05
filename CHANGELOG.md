@@ -1,6 +1,19 @@
 ## CHANGELOG
 ### Use it to document your changes in your branch
 
+## [Unreleased]
+### Added
+- `fine_tune_main.py`, `fine_tune.py`, `data_extraction.py`, `data_extraction.ipynb`.
+- fine_tune* allows the possibility to fine tune existing geomodels.
+- data_extraction* are scripts to collect annotations from iNatAtor database.
+- added example annotation data to use fine-tuner out of the box `data/annotations/example.csv`
+- added `.env.copy` a skeleton `.env` to store database secrets
+- added `scripts` to have sbatch jobs ready to run
+
+### Changed
+- `README.md` updated with instructions on fine tuning
+- `losses.py` added 2 new loss functions that are used in fine tuning
+
 ## 6/3/2024 v1.0.0
 ### Added
 - CHANGELOG.md to keep track of progress and changes to repo

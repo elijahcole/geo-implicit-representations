@@ -11,3 +11,4 @@ sqlalchemy
 shapely
 pyproj
 psycopg2-binary
+ipykernel

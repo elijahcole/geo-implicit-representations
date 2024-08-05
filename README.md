@@ -191,6 +191,21 @@ Now run `python reproduce.py` to create recon results from pretrained models. Wh
 
 Contact Ozel with errors if any.
 
+### Fine Tuning
+Make sure you have followed the steps for downloading training data described above.
+
+To extract annotation data from iNatAtor, use `data_extraction.ipynb` or `data_extraction.py` (to submit as jobs). You will need to confidure a .env that has connection secrets. If your database is running in your local computer and you want to use unity to extract data as a job you will need to build a tunnel. For development and testing I suggest running this script on the same computer as your database and then upload the .csv file into unity to `inaturalist-sinr/data/annotation`.
+
+When your data is ready, you can use `.sh` scripts in `scripts/` or open an interactive VSCode session on Unity (this method is preferred) to start fine tuning.
+
+If you are running jobs, you can run them as `sbatch scripts/fine_tune.sh`. You use `results_from.sh` script to fill out model command details and submit the job to get the image.
+
+If you are using interactive VSCode, you can run `python fine_tune_main.py` to start fine tuning. You can run `python viz_map.py --name fine_tuned --model_path /path/to/inaturalist-sinr/fine-tuned/demo/${YOUR_SAVED_MODEL_NAME}.pt --taxa_id ${TAXA}` to see updates on your predictions.
+
+Please refer to fine-tuning report to get a deeper understanding of changes and updates.
+
+Currently the `pretrained_models/model_an_full_input_enc_sin_cos_distilled_from_env.pt` model cannot be fine-tuned. We noticed that the model saved and a training batch had different dimenstions, we are investigating this issue.
+
 ##  🙏 Acknowledgements
 This project was enabled by data from the Cornell Lab of Ornithology, The International Union for the Conservation of Nature, iNaturalist, NASA, USGS, JAXA, CIESIN, and UC Merced. We are especially indebted to the [iNaturalist](inaturalist.org) and [eBird](https://ebird.org) communities for their data collection efforts. We also thank Matt Stimas-Mackey and Sam Heinrich for their help with data curation. This project was funded by the [Climate Change AI Innovation Grants](https://www.climatechange.ai/blog/2022-04-13-innovation-grants) program, hosted by Climate Change AI with the support of the Quadrature Climate Foundation, Schmidt Futures, and the Canada Hub of Future Earth. This work was also supported by the Caltech Resnick Sustainability Institute and an NSF Graduate Research Fellowship (grant number DGE1745301).  
 

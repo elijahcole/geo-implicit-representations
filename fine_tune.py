@@ -125,7 +125,7 @@ def get_annotation_data(params):
 
 class FineTuner():
     """
-    Fine tuner suite used to mainly fine tune a provided geomodel.
+    Fine tuner suite used to mainly fine tune a provided geomodel. It additionally has an option to freeze locational embedder, further details in the Fine Tuning report.
     """
 
     def __init__(self, model: torch.nn.Module, data_loader: torch.utils.data.DataLoader, params: dict, freeze_loc_emb=True):
@@ -190,14 +190,6 @@ def launch_fine_tuning_run(ovr):
     params['save_path'] = os.path.join(params['fine_tuned_save_base'], params['fine_tuned_experiment_name'])
     os.makedirs(params['save_path'], exist_ok=True)
 
-    # model:
-    pretrain_params = torch.load(ovr['pretrain_model_path'], map_location='cpu')
-    model = models.get_model(pretrain_params['params'])
-    model.load_state_dict(pretrain_params['state_dict'], strict=True)
-    model = model.to(params['device'])
-
-    print('Params: ', params)
-
     # data:
     train_dataset = get_annotation_data(params)
     params['input_dim'] = train_dataset.input_dim
@@ -208,6 +200,16 @@ def launch_fine_tuning_run(ovr):
         batch_size=params['batch_size'],
         shuffle=True,
         num_workers=4)
+
+    # model:
+    pretrain_params = torch.load(ovr['pretrain_model_path'], map_location='cpu')
+    model = models.get_model(pretrain_params['params'])
+    model.load_state_dict(pretrain_params['state_dict'], strict=True)
+    model = model.to(params['device'])
+    print(model)
+
+    myparams = {k: params[k] for k in set(list(params.keys())) - set(['class_to_taxa'])}
+    print('Params: ', myparams)
 
     # train:
     trainer = FineTuner(model, train_loader, params, True) # True: freezes the locational embedder of the model with freeze it only trains class_emb the last layer, False: trains the whole network (predictions for unannotated species will also change)

@@ -13,7 +13,4 @@ set +e
 module load miniconda/22.11.1-1
 conda activate sinr_icml
 
-python /home/oyilmazel_umass_edu/inaturalist-sinr/viz_map.py  --name new --model_path /home/oyilmazel_umass_edu/inaturalist-sinr/fine-tuned/demo/fine_tune_xsmall_lr.pt --taxa_id 5165
-python /home/oyilmazel_umass_edu/inaturalist-sinr/viz_map.py  --name new --model_path /home/oyilmazel_umass_edu/inaturalist-sinr/fine-tuned/demo/fine_tune_xsmall_lr.pt --taxa_id 47518
-python /home/oyilmazel_umass_edu/inaturalist-sinr/viz_map.py  --name new --model_path /home/oyilmazel_umass_edu/inaturalist-sinr/fine-tuned/demo/fine_tune_xsmall_lr.pt --taxa_id 741901
-python /home/oyilmazel_umass_edu/inaturalist-sinr/viz_map.py  --name new --model_path /home/oyilmazel_umass_edu/inaturalist-sinr/fine-tuned/demo/fine_tune_xsmall_lr.pt --taxa_id 130714
+python /home/oyilmazel_umass_edu/inaturalist-sinr/viz_map.py  --name placeholder_name --model_path path/to/model --taxa_id taxa

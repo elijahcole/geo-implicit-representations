@@ -17,8 +17,8 @@ def get_loss_function(params):
         return an_ssdl_me
     elif params['loss'] == 'bce':
         return bce
-    elif params['loss'] == 'bce_ssdl_an':
-        return bce_ssdl_an
+    elif params['loss'] == 'bce_dl_an':
+        return bce_dl_an
 
 def neg_log(x):
     return -torch.log(x + 1e-5)
@@ -181,8 +181,9 @@ def an_slds_me(batch, model, params, loc_to_feats):
     
     return an_slds(batch, model, params, loc_to_feats, neg_type='entropy')
 
-def bce_ssdl_an(batch, model, params, loc_to_feats, neg_type='hard'):
+def bce_dl_an(batch, model, params, loc_to_feats, neg_type='hard'):
     """
+    Loss function for fine tuning, combines bce loss and ssdl loss. Further discussed in fine tuning report.
 
     Parameters:
         - batch: the annotation batch that supplies: locational features, locations (unused), class ids, annotation types (0 | 1)
@@ -213,4 +214,4 @@ def bce_ssdl_an(batch, model, params, loc_to_feats, neg_type='hard'):
     loc_pred_input = loc_pred[inds[:batch_size], class_id]
     dl_an = F.binary_cross_entropy(loc_pred_input, torch.zeros_like(loc_pred_input))
 
-    return bce_loss * params['bce_weight'] + dl_an * (params['bce_weight'] * 1000)
+    return bce_loss * params['bce_weight'] + dl_an * params['dl_an_weight']

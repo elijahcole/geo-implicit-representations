@@ -10,8 +10,6 @@ pretrained_models.zip
 .env
 data.zip
 fine-tuned/*
-annotation/
 data/
 images/
 scripts/out/
-images/

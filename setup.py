@@ -31,6 +31,7 @@ def get_default_params_train(overrides={}):
     params['annotation_file'] = ''
     params['model_name'] = ''
     params['bce_weight'] = 1
+    params['dl_an_weight'] = 1
 
     '''
     data
